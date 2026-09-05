@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amir Juice & Bakery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FBF3E6;
+    --ink:#2E1B12;
+    --rust:#A9431E;
+    --gold:#E2A63B;
+    --leaf:#5B7A4A;
+    --line:#E4D5BE;
+    --card:#FFFDF9;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:'Work Sans',sans-serif;line-height:1.5;}
+  h1,h2,h3{font-family:'Fraunces',serif;font-weight:600;margin:0;}
+  a{color:inherit;}
+  img{max-width:100%;display:block;}
+
+  /* ---------- header ---------- */
+  header{display:flex;align-items:center;justify-content:space-between;padding:22px 6vw;position:sticky;top:0;background:rgba(251,243,230,.92);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);z-index:20;}
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand-mark{width:34px;height:34px;flex:none;}
+  .brand-name{font-family:'Fraunces',serif;font-size:20px;font-weight:600;}
+  nav a{margin-left:28px;text-decoration:none;font-size:15px;color:var(--ink);opacity:.75;}
+  nav a:hover{opacity:1;}
+
+  /* ---------- hero ---------- */
+  .hero{display:grid;grid-template-columns:1.1fr 0.9fr;gap:40px;align-items:center;padding:64px 6vw 56px;max-width:1180px;margin:0 auto;}
+  .hero h1{font-size:clamp(34px,4.6vw,58px);line-height:1.05;letter-spacing:-.01em;}
+  .hero p{max-width:46ch;margin-top:18px;font-size:17px;color:#5B4636;}
+  .hero-cta{margin-top:28px;display:inline-block;background:var(--rust);color:#fff;padding:13px 26px;border-radius:3px;text-decoration:none;font-size:15px;font-weight:500;}
+  .hero-cta:hover{background:#8f3717;}
+  .hero-art{aspect-ratio:1/1;background:var(--card);border:1px solid var(--line);border-radius:6px;display:flex;align-items:center;justify-content:center;}
+
+  /* ---------- categories ---------- */
+  .catbar{display:flex;gap:10px;padding:0 6vw;max-width:1180px;margin:0 auto 6px;}
+  .catbtn{border:1px solid var(--line);background:var(--card);padding:9px 18px;border-radius:999px;font-size:14px;cursor:pointer;color:var(--ink);}
+  .catbtn.active{background:var(--ink);color:var(--cream);border-color:var(--ink);}
+
+  section.products{padding:36px 6vw 80px;max-width:1180px;margin:0 auto;}
+  .products h2{font-size:28px;margin-bottom:22px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:22px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:6px;overflow:hidden;display:flex;flex-direction:column;}
+  .card-img{aspect-ratio:4/3;background:linear-gradient(135deg,var(--gold),var(--rust));display:flex;align-items:center;justify-content:center;}
+  .card-img.bakery{background:linear-gradient(135deg,#C77A3C,var(--rust));}
+  .card-img svg{width:56px;height:56px;}
+  .card-body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:6px;flex:1;}
+  .card-body h3{font-size:17px;}
+  .card-body p{margin:0;font-size:13.5px;color:#6B5747;flex:1;}
+  .price-row{display:flex;align-items:center;justify-content:space-between;margin-top:8px;}
+  .price{font-family:'Fraunces',serif;font-weight:600;font-size:18px;color:var(--rust);}
+  .order-btn{background:var(--ink);color:var(--cream);border:none;padding:9px 16px;border-radius:3px;font-size:13.5px;cursor:pointer;}
+  .order-btn:hover{background:var(--rust);}
+  .empty{color:#8a7660;font-size:14px;}
+
+  /* ---------- modal ---------- */
+  .overlay{position:fixed;inset:0;background:rgba(46,27,18,.5);display:none;align-items:center;justify-content:center;padding:20px;z-index:50;}
+  .overlay.show{display:flex;}
+  .modal{background:var(--card);border-radius:6px;max-width:400px;width:100%;padding:28px;position:relative;}
+  .modal h3{font-size:20px;margin-bottom:4px;}
+  .modal .modal-price{color:var(--rust);font-family:'Fraunces',serif;font-weight:600;margin-bottom:16px;}
+  .modal label{display:block;font-size:13px;margin:12px 0 5px;color:#5B4636;}
+  .modal input,.modal textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:3px;font-family:inherit;font-size:14px;background:#fff;}
+  .modal textarea{resize:vertical;min-height:60px;}
+  .modal-submit{margin-top:20px;width:100%;background:var(--rust);color:#fff;border:none;padding:12px;border-radius:3px;font-size:15px;cursor:pointer;}
+  .modal-submit:hover{background:#8f3717;}
+  .modal-close{position:absolute;top:14px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:#8a7660;}
+  .modal-msg{margin-top:12px;font-size:14px;}
+  .modal-msg.ok{color:var(--leaf);}
+  .modal-msg.err{color:var(--rust);}
+
+  /* ---------- contact / footer ---------- */
+  footer{background:var(--ink);color:var(--cream);padding:52px 6vw 32px;}
+  .foot-wrap{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1.2fr 1fr;gap:40px;}
+  footer h2{font-size:24px;color:var(--cream);}
+  footer p{margin:4px 0;color:#D9C9B6;font-size:14.5px;}
+  .foot-line{margin-top:20px;border-top:1px solid #4a3626;padding-top:18px;font-size:13px;color:#a08d78;}
+
+  @media(max-width:760px){
+    .hero{grid-template-columns:1fr;padding-top:40px;}
+    .hero-art{max-width:280px;margin:0 auto;}
+    .foot-wrap{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <svg class="brand-mark" viewBox="0 0 40 40" fill="none">
+      <circle cx="20" cy="20" r="19" fill="#E2A63B"/>
+      <path d="M20 6c-6 4-9 9-9 14a9 9 0 0018 0c0-5-3-10-9-14z" fill="#A9431E"/>
+    </svg>
+    <span class="brand-name">Amir Juice & Bakery</span>
+  </div>
+  <nav>
+    <a href="#menu">Menu</a>
+    <a href="#contact">Contact</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div>
+    <h1>Fresh juice.<br>Warm bread.<br>Every day.</h1>
+    <p>Amir and Sons has been squeezing fruit and baking bread the honest way, in Gujranwala. Pick what you like and order it straight from the menu below.</p>
+    <a href="#menu" class="hero-cta">See the menu</a>
+  </div>
+  <div class="hero-art">
+    <svg width="70%" viewBox="0 0 200 200" fill="none">
+      <circle cx="72" cy="100" r="55" fill="#E2A63B"/>
+      <g>
+        <path d="M72 45a55 55 0 010 110" stroke="#FBF3E6" stroke-width="2" opacity=".5"/>
+        <path d="M72 45v110M28 70l88 60M28 130l88-60" stroke="#FBF3E6" stroke-width="2" opacity=".5"/>
+      </g>
+      <ellipse cx="140" cy="120" rx="42" ry="26" fill="#A9431E"/>
+      <path d="M110 112c6-14 20-22 30-22s24 8 30 22" stroke="#FBF3E6" stroke-width="2" opacity=".6" fill="none"/>
+    </svg>
+  </div>
+</section>
+
+<div id="menu"></div>
+<div class="catbar" id="catbar"></div>
+<section class="products">
+  <h2>Menu</h2>
+  <div class="grid" id="grid">
+    <p class="empty">Loading menu…</p>
+  </div>
+</section>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <button class="modal-close" id="modalClose">&times;</button>
+    <h3 id="modalName"></h3>
+    <div class="modal-price" id="modalPrice"></div>
+    <form id="orderForm">
+      <label>Your name</label>
+      <input type="text" id="custName" required>
+      <label>Phone number</label>
+      <input type="tel" id="custPhone" required>
+      <label>Delivery address</label>
+      <textarea id="custAddress" required></textarea>
+      <label>Quantity</label>
+      <input type="number" id="custQty" min="1" value="1" required>
+      <button type="submit" class="modal-submit">Place order</button>
+      <div class="modal-msg" id="modalMsg"></div>
+    </form>
+  </div>
+</div>
+
+<footer id="contact">
+  <div class="foot-wrap">
+    <div>
+      <h2>Visit or call us</h2>
+      <p>Amir Aziz — Amir and Sons</p>
+      <p>Gujranwala, Lahore</p>
+      <p>0324-9968832</p>
+      <p>amirazizawan123@gmail.com</p>
+    </div>
+    <div>
+      <h2>Hours</h2>
+      <p>Open daily, 9:00 AM – 10:00 PM</p>
+    </div>
+  </div>
+  <div class="foot-line">© <span id="year"></span> Amir Juice & Bakery</div>
+</footer>
+
+<script>
+  // ⚠️ Paste your deployed Apps Script Web App URL here (see setup guide, step 4)
+  const API_URL = "https://script.google.com/macros/s/AKfycbwZnFCNJDOx8iLWAjFQV6puR8MjC3d2kf4unKvhqJMkyO-WlsNSoYI6bOh2RGVzgTMfMg/exec";
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  let allProducts = [];
+  let activeCategory = 'All';
+
+  const juiceIcon = `<svg viewBox="0 0 24 24" fill="none"><path d="M7 3h10l-1.5 15a2 2 0 01-2 2h-3a2 2 0 01-2-2L7 3z" stroke="#fff" stroke-width="1.6"/><path d="M7.6 9h8.8" stroke="#fff" stroke-width="1.6"/></svg>`;
+  const bakeryIcon = `<svg viewBox="0 0 24 24" fill="none"><ellipse cx="12" cy="14" rx="9" ry="6" stroke="#fff" stroke-width="1.6"/><path d="M6 12c1-3 4-5 6-5s5 2 6 5" stroke="#fff" stroke-width="1.6"/></svg>`;
+
+  async function loadProducts(){
+    try{
+      const res = await fetch(`${API_URL}?action=getProducts`);
+      const data = await res.json();
+      allProducts = (data || []).filter(p => p.available);
+      renderCategories();
+      renderGrid();
+    }catch(err){
+      document.getElementById('grid').innerHTML = '<p class="empty">Could not load the menu. Check the API_URL in index.html.</p>';
+    }
+  }
+
+  function renderCategories(){
+    const cats = ['All', ...new Set(allProducts.map(p => p.category))];
+    const bar = document.getElementById('catbar');
+    bar.innerHTML = cats.map(c =>
+      `<button class="catbtn ${c===activeCategory?'active':''}" data-cat="${c}">${c}</button>`
+    ).join('');
+    bar.querySelectorAll('.catbtn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        activeCategory = btn.dataset.cat;
+        renderCategories();
+        renderGrid();
+      });
+    });
+  }
+
+  function renderGrid(){
+    const list = activeCategory === 'All' ? allProducts : allProducts.filter(p => p.category === activeCategory);
+    const grid = document.getElementById('grid');
+    if(!list.length){ grid.innerHTML = '<p class="empty">Nothing here yet.</p>'; return; }
+    grid.innerHTML = list.map(p => `
+      <div class="card">
+        <div class="card-img ${p.category==='Bakery'?'bakery':''}">${p.image ? `<img src="${p.image}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;">` : (p.category==='Bakery'?bakeryIcon:juiceIcon)}</div>
+        <div class="card-body">
+          <h3>${p.name}</h3>
+          <p>${p.description || ''}</p>
+          <div class="price-row">
+            <span class="price">Rs ${p.price}</span>
+            <button class="order-btn" data-id="${p.id}">Order</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+    grid.querySelectorAll('.order-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=> openModal(btn.dataset.id));
+    });
+  }
+
+  let currentProduct = null;
+
+  function openModal(id){
+    currentProduct = allProducts.find(p => String(p.id) === String(id));
+    if(!currentProduct) return;
+    document.getElementById('modalName').textContent = currentProduct.name;
+    document.getElementById('modalPrice').textContent = `Rs ${currentProduct.price}`;
+    document.getElementById('modalMsg').textContent = '';
+    document.getElementById('orderForm').reset();
+    document.getElementById('custQty').value = 1;
+    document.getElementById('overlay').classList.add('show');
+  }
+  function closeModal(){ document.getElementById('overlay').classList.remove('show'); }
+  document.getElementById('modalClose').addEventListener('click', closeModal);
+  document.getElementById('overlay').addEventListener('click', e=>{ if(e.target.id==='overlay') closeModal(); });
+
+  document.getElementById('orderForm').addEventListener('submit', async e=>{
+    e.preventDefault();
+    const msg = document.getElementById('modalMsg');
+    msg.textContent = 'Placing order…';
+    msg.className = 'modal-msg';
+
+    const payload = {
+      action: 'placeOrder',
+      productId: currentProduct.id,
+      quantity: document.getElementById('custQty').value,
+      customerName: document.getElementById('custName').value,
+      phone: document.getElementById('custPhone').value,
+      address: document.getElementById('custAddress').value
+    };
+
+    try{
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // avoids CORS preflight
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if(data.success){
+        msg.textContent = `Order placed! Your order ID is ${data.orderId}.`;
+        msg.className = 'modal-msg ok';
+        document.getElementById('orderForm').reset();
+      }else{
+        msg.textContent = data.error || 'Something went wrong. Please try again.';
+        msg.className = 'modal-msg err';
+      }
+    }catch(err){
+      msg.textContent = 'Could not reach the server. Please try again.';
+      msg.className = 'modal-msg err';
+    }
+  });
+
+  loadProducts();
+</script>
+</body>
+</html>
