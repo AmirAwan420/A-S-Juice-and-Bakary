@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Amir Juice & Bakery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FBF3E6; --ink:#2E1B12; --rust:#A9431E; --gold:#E2A63B;
+    --leaf:#5B7A4A; --line:#E4D5BE; --card:#FFFDF9;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:'Work Sans',sans-serif;}
+  h1,h2,h3{font-family:'Fraunces',serif;font-weight:600;margin:0;}
+
+  /* login */
+  .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+  .login-box{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:36px;max-width:340px;width:100%;}
+  .login-box h1{font-size:22px;margin-bottom:6px;}
+  .login-box p{font-size:13.5px;color:#6B5747;margin-bottom:20px;}
+  .login-box label{display:block;font-size:13px;margin:12px 0 5px;color:#5B4636;}
+  .login-box input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:3px;font-size:14px;}
+  .login-box button{margin-top:18px;width:100%;background:var(--rust);color:#fff;border:none;padding:12px;border-radius:3px;font-size:15px;cursor:pointer;}
+  .login-msg{margin-top:12px;font-size:13.5px;color:var(--rust);}
+
+  /* dashboard shell */
+  .app{display:none;}
+  .app.show{display:block;}
+  header{display:flex;align-items:center;justify-content:space-between;padding:18px 5vw;border-bottom:1px solid var(--line);background:var(--card);}
+  header h1{font-size:18px;}
+  .logout{background:none;border:1px solid var(--line);padding:8px 16px;border-radius:3px;font-size:13px;cursor:pointer;color:var(--ink);}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;padding:24px 5vw 0;max-width:1180px;margin:0 auto;}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:16px 18px;}
+  .stat .num{font-family:'Fraunces',serif;font-size:26px;color:var(--rust);}
+  .stat .lbl{font-size:12.5px;color:#6B5747;margin-top:2px;}
+
+  .tabs{display:flex;gap:8px;padding:24px 5vw 0;max-width:1180px;margin:0 auto;}
+  .tab{border:1px solid var(--line);background:var(--card);padding:9px 20px;border-radius:999px;font-size:14px;cursor:pointer;}
+  .tab.active{background:var(--ink);color:var(--cream);border-color:var(--ink);}
+
+  main{padding:20px 5vw 60px;max-width:1180px;margin:0 auto;}
+  .panel{display:none;}
+  .panel.show{display:block;}
+
+  .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+  .btn{background:var(--rust);color:#fff;border:none;padding:10px 18px;border-radius:3px;font-size:14px;cursor:pointer;}
+  .btn.secondary{background:none;border:1px solid var(--line);color:var(--ink);}
+
+  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:6px;overflow:hidden;}
+  th,td{text-align:left;padding:11px 14px;font-size:13.5px;border-bottom:1px solid var(--line);}
+  th{background:#F3E7D4;font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.03em;color:#6B5747;}
+  tr:last-child td{border-bottom:none;}
+  .badge{padding:3px 10px;border-radius:999px;font-size:12px;display:inline-block;}
+  .badge.Pending{background:#F3E1B5;color:#7A5A15;}
+  .badge.Confirmed{background:#D9E6CE;color:#3F5E2E;}
+  .badge.Delivered{background:#CFE3DB;color:#2A5847;}
+  .badge.Cancelled{background:#F0D3CB;color:#8f3717;}
+  select{padding:6px 8px;border-radius:3px;border:1px solid var(--line);font-size:13px;}
+  .icon-btn{background:none;border:none;cursor:pointer;color:var(--rust);font-size:13px;text-decoration:underline;margin-right:10px;}
+  .empty{color:#8a7660;font-size:14px;padding:20px 0;}
+
+  /* product form modal */
+  .overlay{position:fixed;inset:0;background:rgba(46,27,18,.5);display:none;align-items:center;justify-content:center;padding:20px;z-index:50;}
+  .overlay.show{display:flex;}
+  .modal{background:var(--card);border-radius:6px;max-width:420px;width:100%;padding:28px;}
+  .modal h3{font-size:19px;margin-bottom:16px;}
+  .modal label{display:block;font-size:13px;margin:10px 0 5px;color:#5B4636;}
+  .modal input,.modal select,.modal textarea{width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:3px;font-size:14px;font-family:inherit;}
+  .modal textarea{min-height:60px;resize:vertical;}
+  .modal-actions{display:flex;gap:10px;margin-top:20px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media(max-width:700px){ .stats{grid-template-columns:1fr 1fr;} }
+</style>
+</head>
+<body>
+
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <h1>Admin Dashboard</h1>
+    <p>Amir Juice & Bakery</p>
+    <label>Username</label>
+    <input type="text" id="loginUser">
+    <label>Password</label>
+    <input type="password" id="loginPass">
+    <button id="loginBtn">Log in</button>
+    <div class="login-msg" id="loginMsg"></div>
+  </div>
+</div>
+
+<div class="app" id="app">
+  <header>
+    <h1>Amir Juice & Bakery — Admin</h1>
+    <button class="logout" id="logoutBtn">Log out</button>
+  </header>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="orders">Orders</button>
+    <button class="tab" data-tab="products">Products</button>
+  </div>
+
+  <main>
+    <div class="panel show" id="panel-orders">
+      <div class="toolbar"><h2>Orders</h2></div>
+      <table>
+        <thead><tr><th>Order</th><th>Date</th><th>Product</th><th>Qty</th><th>Total</th><th>Customer</th><th>Phone</th><th>Status</th></tr></thead>
+        <tbody id="ordersBody"></tbody>
+      </table>
+    </div>
+
+    <div class="panel" id="panel-products">
+      <div class="toolbar">
+        <h2>Products</h2>
+        <button class="btn" id="addProductBtn">+ Add product</button>
+      </div>
+      <table>
+        <thead><tr><th>Name</th><th>Category</th><th>Price</th><th>Available</th><th></th></tr></thead>
+        <tbody id="productsBody"></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<div class="overlay" id="productOverlay">
+  <div class="modal">
+    <h3 id="productModalTitle">Add product</h3>
+    <form id="productForm">
+      <input type="hidden" id="pId">
+      <label>Name</label>
+      <input type="text" id="pName" required>
+      <div class="row2">
+        <div>
+          <label>Category</label>
+          <select id="pCategory">
+            <option>Juice</option>
+            <option>Bakery</option>
+          </select>
+        </div>
+        <div>
+          <label>Price (Rs)</label>
+          <input type="number" id="pPrice" required>
+        </div>
+      </div>
+      <label>Description</label>
+      <textarea id="pDescription"></textarea>
+      <label>Image URL (optional)</label>
+      <input type="text" id="pImage">
+      <label><input type="checkbox" id="pAvailable" checked style="width:auto;"> Available for order</label>
+      <div class="modal-actions">
+        <button type="button" class="btn secondary" id="productCancel">Cancel</button>
+        <button type="submit" class="btn">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // ⚠️ Paste your deployed Apps Script Web App URL here (same as index.html)
+  const API_URL = "https://script.google.com/macros/s/AKfycbwZnFCNJDOx8iLWAjFQV6puR8MjC3d2kf4unKvhqJMkyO-WlsNSoYI6bOh2RGVzgTMfMg/exec";
+
+  let creds = null; // { username, password }
+  let products = [];
+  let orders = [];
+
+  /* ---------- login ---------- */
+  function loadSession(){
+    const saved = localStorage.getItem('amir_admin_creds');
+    if(saved){ creds = JSON.parse(saved); showApp(); }
+  }
+  document.getElementById('loginBtn').addEventListener('click', async ()=>{
+    const username = document.getElementById('loginUser').value.trim();
+    const password = document.getElementById('loginPass').value;
+    const msg = document.getElementById('loginMsg');
+    msg.textContent = 'Checking…';
+    try{
+      const res = await fetch(API_URL, {
+        method:'POST',
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body: JSON.stringify({ action:'adminLogin', username, password })
+      });
+      const data = await res.json();
+      if(data.success){
+        creds = { username, password };
+        localStorage.setItem('amir_admin_creds', JSON.stringify(creds));
+        showApp();
+      }else{
+        msg.textContent = 'Wrong username or password.';
+      }
+    }catch(err){
+      msg.textContent = 'Could not reach the server. Check the API_URL in admin.html.';
+    }
+  });
+  document.getElementById('logoutBtn').addEventListener('click', ()=>{
+    localStorage.removeItem('amir_admin_creds');
+    location.reload();
+  });
+
+  function showApp(){
+    document.getElementById('loginWrap').style.display = 'none';
+    document.getElementById('app').classList.add('show');
+    loadStats(); loadOrders(); loadProducts();
+  }
+
+  /* ---------- tabs ---------- */
+  document.querySelectorAll('.tab').forEach(tab=>{
+    tab.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
+      tab.classList.add('active');
+      document.getElementById('panel-'+tab.dataset.tab).classList.add('show');
+    });
+  });
+
+  /* ---------- stats ---------- */
+  async function loadStats(){
+    const res = await fetch(`${API_URL}?action=getStats&username=${encodeURIComponent(creds.username)}&password=${encodeURIComponent(creds.password)}`);
+    const s = await res.json();
+    document.getElementById('stats').innerHTML = `
+      <div class="stat"><div class="num">${s.totalOrders ?? '-'}</div><div class="lbl">Total orders</div></div>
+      <div class="stat"><div class="num">${s.pendingOrders ?? '-'}</div><div class="lbl">Pending orders</div></div>
+      <div class="stat"><div class="num">Rs ${s.totalRevenue ?? '-'}</div><div class="lbl">Total revenue</div></div>
+      <div class="stat"><div class="num">${s.totalProducts ?? '-'}</div><div class="lbl">Products listed</div></div>
+    `;
+  }
+
+  /* ---------- orders ---------- */
+  async function loadOrders(){
+    const res = await fetch(`${API_URL}?action=getOrders&username=${encodeURIComponent(creds.username)}&password=${encodeURIComponent(creds.password)}`);
+    orders = await res.json();
+    const body = document.getElementById('ordersBody');
+    if(!orders.length){ body.innerHTML = '<tr><td colspan="8" class="empty">No orders yet.</td></tr>'; return; }
+    body.innerHTML = orders.map(o => `
+      <tr>
+        <td>${o.orderId}</td>
+        <td>${new Date(o.date).toLocaleString()}</td>
+        <td>${o.productName}</td>
+        <td>${o.quantity}</td>
+        <td>Rs ${o.total}</td>
+        <td>${o.customerName}</td>
+        <td>${o.phone}</td>
+        <td>
+          <select data-order="${o.orderId}" class="statusSelect">
+            ${['Pending','Confirmed','Delivered','Cancelled'].map(s=>`<option ${s===o.status?'selected':''}>${s}</option>`).join('')}
+          </select>
+        </td>
+      </tr>
+    `).join('');
+    document.querySelectorAll('.statusSelect').forEach(sel=>{
+      sel.addEventListener('change', async ()=>{
+        await fetch(API_URL, {
+          method:'POST',
+          headers:{'Content-Type':'text/plain;charset=utf-8'},
+          body: JSON.stringify({ action:'updateOrderStatus', orderId: sel.dataset.order, status: sel.value, ...creds })
+        });
+        loadStats();
+      });
+    });
+  }
+
+  /* ---------- products ---------- */
+  async function loadProducts(){
+    const res = await fetch(`${API_URL}?action=getProducts`);
+    products = await res.json();
+    const body = document.getElementById('productsBody');
+    if(!products.length){ body.innerHTML = '<tr><td colspan="5" class="empty">No products yet.</td></tr>'; return; }
+    body.innerHTML = products.map(p => `
+      <tr>
+        <td>${p.name}</td>
+        <td>${p.category}</td>
+        <td>Rs ${p.price}</td>
+        <td>${p.available ? 'Yes' : 'No'}</td>
+        <td>
+          <button class="icon-btn" data-edit="${p.id}">Edit</button>
+          <button class="icon-btn" data-del="${p.id}" style="color:#8f3717;">Delete</button>
+        </td>
+      </tr>
+    `).join('');
+    document.querySelectorAll('[data-edit]').forEach(btn=>{
+      btn.addEventListener('click', ()=> openProductModal(btn.dataset.edit));
+    });
+    document.querySelectorAll('[data-del]').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        if(!confirm('Delete this product?')) return;
+        await fetch(API_URL, {
+          method:'POST',
+          headers:{'Content-Type':'text/plain;charset=utf-8'},
+          body: JSON.stringify({ action:'deleteProduct', id: btn.dataset.del, ...creds })
+        });
+        loadProducts(); loadStats();
+      });
+    });
+  }
+
+  function openProductModal(id){
+    const p = id ? products.find(x=>String(x.id)===String(id)) : null;
+    document.getElementById('productModalTitle').textContent = p ? 'Edit product' : 'Add product';
+    document.getElementById('pId').value = p ? p.id : '';
+    document.getElementById('pName').value = p ? p.name : '';
+    document.getElementById('pCategory').value = p ? p.category : 'Juice';
+    document.getElementById('pPrice').value = p ? p.price : '';
+    document.getElementById('pDescription').value = p ? p.description : '';
+    document.getElementById('pImage').value = p ? p.image : '';
+    document.getElementById('pAvailable').checked = p ? p.available : true;
+    document.getElementById('productOverlay').classList.add('show');
+  }
+  document.getElementById('addProductBtn').addEventListener('click', ()=> openProductModal(null));
+  document.getElementById('productCancel').addEventListener('click', ()=>{
+    document.getElementById('productOverlay').classList.remove('show');
+  });
+
+  document.getElementById('productForm').addEventListener('submit', async e=>{
+    e.preventDefault();
+    const id = document.getElementById('pId').value;
+    const payload = {
+      action: id ? 'updateProduct' : 'addProduct',
+      id: id,
+      name: document.getElementById('pName').value,
+      category: document.getElementById('pCategory').value,
+      price: document.getElementById('pPrice').value,
+      description: document.getElementById('pDescription').value,
+      image: document.getElementById('pImage').value,
+      available: document.getElementById('pAvailable').checked,
+      ...creds
+    };
+    await fetch(API_URL, {
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    });
+    document.getElementById('productOverlay').classList.remove('show');
+    loadProducts(); loadStats();
+  });
+
+  loadSession();
+</script>
+</body>
+</html>
